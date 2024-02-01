@@ -1,8 +1,52 @@
 import streamlit as st
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import base64
 
-# Dicionário para mapear cada ODS à sua categoria nome_do_ambiente\Scripts\activate
+st.set_page_config(
+    page_title="Similarity ODS",
+    page_icon="🌎"
+)
+@st.cache_data()
+def get_img_as_base64(file):
+    with open(file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+img = get_img_as_base64("fundoesg4k.png")
+img2 = get_img_as_base64("esgfundo1.png")
+
+page_bg_img = f"""
+<style>
+[data-testid="stAppViewContainer"] > .main {{
+    background-image: url("data:fundoesg4k/png;base64,{img}");
+    background-size: 100%;
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}}
+[data-testid="stSidebar"] > div:first-child {{
+    background-image: url("data:esgfundo1/png;base64,{img2}");
+    background-position: center; 
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}}
+
+[data-testid="stHeader"] {{
+    background: rgba(0,0,0,0);
+}}
+
+[data-testid="stToolbar"] {{
+    right: 2rem;
+}}
+</style>
+"""
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
+st.sidebar.image("logoesg.png", width=250)
+
+
 ods_categoria = {
     1: "Erradicação da pobreza" " (Social)",
     2: "Fome zero e agricultura sustentável" " (Social)",
@@ -23,7 +67,6 @@ ods_categoria = {
     17: "Parcerias e meios de implementação" " (Governança)",
 }
 
-# Textos representativos para cada ODS (exemplo)
 ods_texts = [
 
     "Pobreza extrema, inclusão social, desigualdade econômica, fome, vulnerabilidade, acesso à educação, emprego digno, sustentabilidade social, igualdade de oportunidades, resiliência financeira, proteção social, microfinanças, redução da pobreza, empoderamento econômico, assistência social, fornecimento de recursos, renda mínima, justiça social, desenvolvimento inclusivo, apoio comunitário.",
@@ -43,10 +86,8 @@ ods_texts = [
     "conserva floresta Conservação da biodiversidade, reflorestamento, combate à desertificação, proteção de ecossistemas terrestres, manejo sustentável de florestas, prevenção da extinção de espécies, conservação de habitats naturais, restauração de ecossistemas degradados, biodiversidade em áreas urbanas, proteção de áreas de importância ecológica, redução da perda de solo, combate à caça ilegal, conservação de áreas de importância cultural, monitoramento de espécies ameaçadas, educação ambiental para a vida terrestre, uso sustentável da terra, proteção contra invasões biológicas, incentivo à agricultura sustentável, medidas para a preservação de fauna e flora, desenvolvimento de tecnologias para a conservação.",
     "Estado de direito, justiça social, paz duradoura, direitos humanos, acesso à justiça, combate à corrupção, participação cidadã, igualdade perante a lei, instituições transparentes, redução da violência, proteção de vítimas de crimes, combate ao tráfico humano, promoção da não discriminação, resolução pacífica de conflitos, construção de capacidades institucionais, desenvolvimento de sistemas judiciais eficazes, promoção da verdade e reconciliação, combate à impunidade, cooperação internacional em questões de justiça, educação para a paz.",
     "Cooperação internacional, parcerias público privada, desenvolvimento sustentável, engajamento global, financiamento para o desenvolvimento, compartilhamento de conhecimento, colaboração entre setores, inovação social, tecnologias para o desenvolvimento, capacitação de comunidades locais, transferência de tecnologia, desenvolvimento de capacidades institucionais, mobilização de recursos, desenvolvimento de parcerias multissetoriais, advocacia para os ODS, promoção do voluntariado, cooperação Sul-Sul, monitoramento e avaliação conjunta, participação da sociedade civil, cooperação triangular (países desenvolvidos, em desenvolvimento e instituições internacionais).",
-
 ]
 
-# Lista de palavras indesejadas
 palavras_indesejadas = [
     "a", "e", "o", "que", "de", "do", "da", "em", "um", "para", "com", "não", "uma", "os", "no", "se", ",", "projeto",
     "ação",
@@ -70,21 +111,17 @@ palavras_indesejadas = [
     "terão", "teria", "teríamos", "teriam",
 ]
 
-# Função para remover palavras indesejadas
 def remover_palavras_indesejadas(texto, palavras_indesejadas):
     for palavra in palavras_indesejadas:
         texto = texto.replace(palavra, "")
     return texto
 
-# Função para obter a categoria de uma ODS
 def obter_categoria_ods(ods):
     return ods_categoria.get(ods, "Categoria não definida")
 
-# Função para calcular a similaridade entre a entrada e os textos de cada ODS
 def calcular_similaridade(frase, ods_texts, palavras_indesejadas):
     tfidf_vectorizer = TfidfVectorizer()
 
-    # Remover palavras indesejadas
     frase_processada = remover_palavras_indesejadas(frase, palavras_indesejadas)
     ods_texts_processados = [remover_palavras_indesejadas(texto, palavras_indesejadas) for texto in ods_texts]
 
@@ -93,16 +130,14 @@ def calcular_similaridade(frase, ods_texts, palavras_indesejadas):
 
     return similarity_matrix.flatten()
 
-# Função para encontrar todas as ODS com similaridades não nulas
 def encontrar_todas_ods_similares(frase, ods_texts, palavras_indesejadas):
     similaridades = calcular_similaridade(frase, ods_texts, palavras_indesejadas)
     resultados = [(i + 1, similaridade) for i, similaridade in enumerate(similaridades) if similaridade > 0.05]
     return resultados
 
-# Exemplo de uso
 st.title("Análise de Similaridade com Objetivos de Desenvolvimento Sustentável (ODS)")
 
-frase_usuario = st.text_area("Digite a descrição da sua iniciativa:", height=150)
+frase_usuario = st.text_area("Digite a descrição OU objetivo da sua iniciativa:", height=150)
 
 if st.button("Analisar Similaridade"):
     if frase_usuario:
@@ -116,4 +151,6 @@ if st.button("Analisar Similaridade"):
             st.write("Não há similaridade com nenhuma ODS.")
     else:
         st.warning("Por favor, insira uma descrição para a análise.")
-
+        
+st.sidebar.markdown("---")
+st.sidebar.markdown("Desenvolvido por [PedroFS](https://linktr.ee/Pedrofsf)")
