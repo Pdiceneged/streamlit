@@ -18,17 +18,26 @@ img2 = get_img_as_base64("esgfundo1.png")
 
 page_bg_img = f"""
 <style>
+header, footer {{
+    visibility: hidden !important;
+}}
+
+#MainMenu {{
+    visibility: visible !important;
+    color: #F44D00;
+}}
+
 [data-testid="stAppViewContainer"] > .main {{
     background-image: url("data:fundoesg4k/png;base64,{img}");
-    background-size: 100%;
-    background-position: top left;
+    background-size: cover; 
+    background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }}
 [data-testid="stSidebar"] > div:first-child {{
     background-image: url("data:esgfundo1/png;base64,{img2}");
     background-position: center; 
-    background-size: 100%;
+    background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }}
@@ -39,6 +48,21 @@ page_bg_img = f"""
 
 [data-testid="stToolbar"] {{
     right: 2rem;
+}}
+
+.stTextInput>div>div>input[type="text"] {{
+    background-color: #CFE6D2; 
+    color: #000; 
+    border-radius: 7px; 
+    border: 2px solid #000010; 
+    padding: 5px; 
+    width: 500; 
+}}
+
+@media (max-width: 360px) {{
+    [data-testid="stAppViewContainer"] > .main, [data-testid="stSidebar"] > div:first-child {{
+        background-size: auto;
+    }}
 }}
 </style>
 """
