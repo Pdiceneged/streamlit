@@ -13,8 +13,8 @@ def get_img_as_base64(file):
         data = f.read()
     return base64.b64encode(data).decode()
 
-img = get_img_as_base64("fundoesg4k.png")
-img2 = get_img_as_base64("esgfundo1.png")
+img = get_img_as_base64("pdipaper5.png")
+img2 = get_img_as_base64("pdiside.png")
 
 page_bg_img = f"""
 <style>
@@ -68,7 +68,7 @@ header, footer {{
 """
 
 st.markdown(page_bg_img, unsafe_allow_html=True)
-st.sidebar.image("logoesg.png", width=250)
+st.sidebar.image("Logopdi.png", width=250)
 
 
 ods_categoria = {
